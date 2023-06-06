@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Javascript slider-harjoitus</title>
+<style>
+
+    .carousel {
+      position: relative;
+      display: inline-block;
+      overflow: hidden;
+    }
+
+    .viewport {
+      position: relative;
+      display: inline-block;
+      width: fit-content;
+    }
+
+    .slidet {
+      display: flex;
+      transition: transform 0.5s ease-in-out;
+      width: 100%;
+      height: auto;
+      max-width: 80vw;
+    }
+
+    .slidet img {
+      flex-shrink: 0;
+      width: 100%;
+      height: auto;
+      max-width: 80vw;
+    }
+
+    .prev,
+    .next {
+      position: absolute;
+      top: 45%;
+      font-size: 30px;
+      background-color: transparent;
+      border: none;
+      color: rgb(255, 255, 255);
+      cursor: pointer;
+      z-index: 1;
+      -webkit-text-stroke-width: 2px;
+      -webkit-text-stroke-color: black;
+    }
+
+    .prev {
+      left: 10px;
+    }
+
+    .next {
+      right: 10px;
+    }
+</style>
+</head>
+<body>
+    <div class="carousel">
+        <div class="viewport">
+            <div class="slidet">
+            <!--Muokkaa näihin haluamasi kuvat, mieluiten samankokoiset-->
+            <img src="https://picsum.photos/1600/900" alt="Kuva 1">
+            <img src="https://picsum.photos/1601/901" alt="Kuva 2">
+            <img src="https://picsum.photos/1602/902" alt="Kuva 3">
+            <!--Sama kuin ensimmäinen kuva-->
+            <img src="https://picsum.photos/1600/900" alt="Kuva 4">
+            </div>
+        </div>
+        <button id="prevButton" class="prev" onclick="liikutaSlide(-1)">&#10094;</button>
+        <button id="nextButton" class="next" onclick="liikutaSlide(1)">&#10095;</button>
+    </div>
+<script>
+let moneskoSlide = 0; // Monesko slide on tällä hetkellä esillä
+const slideLeveys = 100; // Sliden leveys (prosentteina)
+const slidejaYhteensa = document.querySelectorAll('.slidet img').length; // Slidejen kokonaislukumäärä
+
+// Funktio joka hoitaa sliden vaihtumisen
+function liikutaSlide(suunta) {
+  const slideLaatikko = document.querySelector('.slidet');
+
+  moneskoSlide += suunta;
+
+  // Pidetään huoli että moneskoSlide pysyy sallitulla välillä
+  if (moneskoSlide < 0) {
+    moneskoSlide = slidejaYhteensa - 2;
+    slideLaatikko.style.transform = `translateX(-${moneskoSlide * slideLeveys}%)`;
+  } 
+  // Palataan takaisin ensimmäseen slideen hyödyntämällä sen kopiota, luoden illuusion täydellisestä loopista 
+  else if (moneskoSlide >= slidejaYhteensa-1) { 
+    slideLaatikko.style.transform = `translateX(-${moneskoSlide * slideLeveys}%)`;
+    moneskoSlide = 0;
+
+    setTimeout(() => {
+      slideLaatikko.style.transition = 'none'; // Siirtymäanimaatio pois päältä kun hypätään viimeisestä diasta ensimmäiseen
+      slideLaatikko.style.transform = `translateX(-${moneskoSlide * slideLeveys}%)`;
+    }, 1000);
+    slideLaatikko.style.transition = 'transform 1s ease-in-out'; // Siirtymäanimaatio takaisin päälle
+  } else {
+    slideLaatikko.style.transition = 'transform 1s ease-in-out'; // Siirtymäanimaatio
+    slideLaatikko.style.transform = `translateX(-${moneskoSlide * slideLeveys}%)`;
+  }
+}
+
+function autoSlide() { // Funktio joka vaihtaa slideä automaattisesti 
+  liikutaSlide(1);
+}
+
+var timerLength = 3000; // Intervalli jonka välein slide vaihtuu
+
+var slideTimer = setInterval(autoSlide, timerLength); 
+slideTimer;
+
+// Pysäytetään automaattinen sliden vaihtuminen hetkeksi jos käyttäjä vaihtaa slideä manuaalisesti
+function clearSlideInterval() {
+  clearInterval(slideTimer);
+  slideTimer = setInterval(autoSlide, timerLength);
+}
+document.getElementById("prevButton").addEventListener("click", clearSlideInterval);
+document.getElementById("nextButton").addEventListener("click", clearSlideInterval);
+    </script>
+</body>
+</html>
